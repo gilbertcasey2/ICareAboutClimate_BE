@@ -3,11 +3,11 @@ using ICareAboutClimateBE.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<ClimateContext>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add DB context here
+builder.Services.AddDbContext<ClimateContext>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CORSPolicy",
@@ -18,14 +18,14 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .WithOrigins("https://localhost:44440");
         });
-    options.AddPolicy("CORSPolicy",
-        builder =>
-        {
-            builder
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .WithOrigins("https://blue-wave-097a15c10.4.azurestaticapps.net");
-        });
+    //options.AddPolicy("CORSPolicy",
+    //    builder =>
+    //    {
+    //        builder
+    //        .AllowAnyMethod()
+    //        .AllowAnyHeader()
+    //        .WithOrigins("https://blue-wave-097a15c10.4.azurestaticapps.net");
+    //    });
 
 });
 builder.Services.AddScoped<IFormServices, FormServices>();
