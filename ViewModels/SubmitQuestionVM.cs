@@ -8,11 +8,14 @@ namespace ICareAboutClimateBE.ViewModels
 
         public int answerIndex {get; set; }
 
-		public SubmitQuestionVM(Guid userID, int questionIndex, int answerIndex)
+		public int formIndex {get; set;}
+
+		public SubmitQuestionVM(Guid userID, int questionIndex, int answerIndex, int formIndex)
 		{
 			this.userID = userID;
             this.questionIndex = questionIndex;
             this.answerIndex = answerIndex;
+			this.formIndex = formIndex;
 		}
 	}
 }
