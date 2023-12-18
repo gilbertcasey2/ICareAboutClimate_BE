@@ -5,12 +5,13 @@ namespace ICareAboutClimateBE.Models
 {
 	public class FormQuestionResponse
     {
+        public int id {get; set;}
 		public int questionIndex { get; set; }
 		public int answerIndex { get; set; }
 
-        public DateTime timeStamp {get; set;}
+        public bool? isFinalResponse {get; set;}
 
-        public bool isFinalResponse {get; set;}
+        public DateTime timeStamp {get; set;}
 
         public FormQuestionResponse(int questionIndex, int answerIndex, DateTime timeStamp)
         {
@@ -20,4 +21,3 @@ namespace ICareAboutClimateBE.Models
         }
     }
 }
-
