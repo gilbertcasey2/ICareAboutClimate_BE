@@ -5,13 +5,16 @@ namespace ICareAboutClimateBE.Models
 {
 	public class FormQuestionResponse
     {
-		public int questionNumber { get; set; }
-		public int answer { get; set; }
+		public int questionIndex { get; set; }
+		public int answerIndex { get; set; }
 
-        public FormQuestionResponse(int questionNumber, int answer)
+        public DateTime timeStamp {get; set;}
+
+        public FormQuestionResponse(int questionIndex, int answerIndex, DateTime timeStamp)
         {
-            this.questionNumber = questionNumber;
-            this.answer = answer;
+            this.questionIndex = questionIndex;
+            this.answerIndex = answerIndex;
+            this.timeStamp = timeStamp;
         }
     }
 }

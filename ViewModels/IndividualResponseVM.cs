@@ -1,11 +1,11 @@
 ﻿using System;
 namespace ICareAboutClimateBE.ViewModels
 {
-	public class IndividualResponse
+	public class IndividualResponseVM
 	{
 		public string questions { get; set; }
 
-		public IndividualResponse(string questions)
+		public IndividualResponseVM(string questions)
 		{
 			this.questions = questions;
 		}
