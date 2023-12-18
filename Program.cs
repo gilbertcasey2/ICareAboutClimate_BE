@@ -1,4 +1,5 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using ICareAboutClimateBE.Services;
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -15,6 +16,8 @@ builder.Services.AddCors(options =>
             .WithOrigins("https://localhost:44440");
         });
 });
+
+builder.Services.AddScoped<IFormServices, FormServices>();
 
 var app = builder.Build();
 

@@ -10,6 +10,8 @@ namespace ICareAboutClimateBE.Models
 
         public DateTime timeStamp {get; set;}
 
+        public bool isFinalResponse {get; set;}
+
         public FormQuestionResponse(int questionIndex, int answerIndex, DateTime timeStamp)
         {
             this.questionIndex = questionIndex;
