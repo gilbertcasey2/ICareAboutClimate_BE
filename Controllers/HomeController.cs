@@ -1,11 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ICareAboutClimate.Models;
-using ICareAboutClimateBE.Models;
-using System;
 using ICareAboutClimateBE.ViewModels;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using ICareAboutClimateBE.Services;
 
 namespace ICareAboutClimate.Controllers;
@@ -55,14 +51,20 @@ public class HomeController : Controller
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult SubmitForm([FromBody] IndividualResponseVM sent_response)
     {
-        string sent_questions = sent_response.questions;
-        FormResponse? q_responses = JsonConvert.DeserializeObject<FormResponse>(sent_questions);
 
-        for (int i = 0; i < q_responses?.responses?.Count; i++)
-        {
-            q_responses.responses[i].isFinalResponse = true;
+        if (sent_response == null) {
+            return ValidationProblem("No question sent.");
         }
-        return Ok(q_responses);
+        try
+        {
+            _formService.SubmitForm(sent_response);
+        } catch(Exception e)
+        {
+            _logger.LogError("An exception adding a single question. Exception: " + e);
+            return StatusCode(500);
+        }
+        
+        return Ok("Successfully indicated submitted a question arrival.");
 
     }
 
@@ -100,14 +102,16 @@ public class HomeController : Controller
         if (sent_question == null) {
             return ValidationProblem("No question sent.");
         }
+
+         try
+        {
+            _formService.SubmitQuestion(sent_question);
+        } catch(Exception e)
+        {
+            _logger.LogError("An exception adding a single question. Exception: " + e);
+            return StatusCode(500);
+        }
         
-        DateTime currentTime = DateTime.Now;
-        FormQuestionResponse new_response = new(sent_question.questionIndex, sent_question.answerIndex, currentTime);
-        new_response.isFinalResponse = false;
-
-        // add response to DB using Guid 
-
-        return Ok(new_response);
-
+        return Ok("Successfully indicated submitted a question arrival.");
     }
 }
