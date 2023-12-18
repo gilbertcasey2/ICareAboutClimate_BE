@@ -1,9 +1,12 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Epistimology_BE.DataAccess;
+using ICareAboutClimateBE.Services;
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add DB context here
+builder.Services.AddDbContext<ClimateContext>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CORSPolicy",
@@ -15,6 +18,8 @@ builder.Services.AddCors(options =>
             .WithOrigins("https://localhost:44440");
         });
 });
+
+builder.Services.AddScoped<IFormServices, FormServices>();
 
 var app = builder.Build();
 
