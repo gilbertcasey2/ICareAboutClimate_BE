@@ -1,10 +1,12 @@
-﻿using ICareAboutClimateBE.Services;
+﻿using Epistimology_BE.DataAccess;
+using ICareAboutClimateBE.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add DB context here
+builder.Services.AddDbContext<ClimateContext>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CORSPolicy",

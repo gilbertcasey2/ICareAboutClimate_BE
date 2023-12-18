@@ -1,5 +1,5 @@
 using System;
-// using Epistimology_BE.DataAccess;
+using Epistimology_BE.DataAccess;
 using ICareAboutClimateBE.Models;
 using ICareAboutClimateBE.ViewModels;
 
@@ -12,11 +12,11 @@ namespace ICareAboutClimateBE.Services
 
     public class FormServices : IFormServices
 	{
-        //private ClimateContext _context;
+        private ClimateContext _context;
 
-        public FormServices()
+        public FormServices(ClimateContext context)
 		{
-
+            _context = context;
 		}
 
         public void ResponseArrival(ArrivedResponseVM arrival_info)
@@ -27,8 +27,8 @@ namespace ICareAboutClimateBE.Services
                 storeageID = new_storeageID,
                 formIndex = arrival_info.formIndex
             };
-            //_context.formResponses.Add(new_response);
-            //_context.SaveChanges();
+            _context.formResponses.Add(new_response);
+            _context.SaveChanges();
         }
 	}
 }
