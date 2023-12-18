@@ -5,8 +5,11 @@ namespace ICareAboutClimateBE.Models
 {
 	public class FormQuestionResponse
     {
+        public int id {get; set;}
 		public int questionIndex { get; set; }
 		public int answerIndex { get; set; }
+
+        public bool? isFinalResponse {get; set;}
 
         public DateTime timeStamp {get; set;}
 

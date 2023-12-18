@@ -5,6 +5,7 @@ using ICareAboutClimateBE.Models;
 using System;
 using ICareAboutClimateBE.ViewModels;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ICareAboutClimate.Controllers;
 
@@ -42,6 +43,11 @@ public class HomeController : Controller
     {
         string sent_questions = sent_response.questions;
         FormResponse? q_responses = JsonConvert.DeserializeObject<FormResponse>(sent_questions);
+
+        for (int i = 0; i < q_responses?.responses?.Count; i++)
+        {
+            q_responses.responses[i].isFinalResponse = true;
+        }
         return Ok(q_responses);
 
     }
@@ -79,6 +85,7 @@ public class HomeController : Controller
         
         DateTime currentTime = DateTime.Now;
         FormQuestionResponse new_response = new(sent_question.questionIndex, sent_question.answerIndex, currentTime);
+        new_response.isFinalResponse = false;
 
         // add response to DB using Guid 
 

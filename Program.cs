@@ -1,5 +1,8 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using Epistimology_BE.DataAccess;
 
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<ClimateContext>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -14,6 +17,15 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .WithOrigins("https://localhost:44440");
         });
+    options.AddPolicy("CORSPolicy",
+        builder =>
+        {
+            builder
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithOrigins("https://blue-wave-097a15c10.4.azurestaticapps.net");
+        });
+
 });
 
 var app = builder.Build();
