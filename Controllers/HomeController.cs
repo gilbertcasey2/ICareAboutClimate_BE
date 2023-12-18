@@ -6,16 +6,19 @@ using System;
 using ICareAboutClimateBE.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using ICareAboutClimateBE.Services;
 
 namespace ICareAboutClimate.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private IFormServices _formService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IFormServices formServices)
     {
         _logger = logger;
+        _formService = formServices;
     }
 
     public IActionResult Index()
@@ -32,6 +35,17 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    [HttpGet]
+    [Route("ok")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public ActionResult HealthCheck()
+    {
+        return Ok("All is well!");
+
     }
 
     [HttpPost]
@@ -62,12 +76,16 @@ public class HomeController : Controller
         if (arrival_info == null) {
             return ValidationProblem("No arrival information sent.");
         }
-        Guid new_storeageID = arrival_info.storeageID;
-        FormResponse new_responses = new() {
-            storeageID = new_storeageID,
-            formIndex = arrival_info.formIndex
-        };
-        return Ok(new_responses);
+        try
+        {
+            _formService.ResponseArrival(arrival_info);
+        } catch(Exception e)
+        {
+            _logger.LogError("An exception adding a user. Exception: " + e);
+            return StatusCode(500);
+        }
+        
+        return Ok("Successfully indicated user's arrival.");
 
     }
 

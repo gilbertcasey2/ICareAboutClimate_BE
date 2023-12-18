@@ -1,4 +1,5 @@
 ﻿using Epistimology_BE.DataAccess;
+using ICareAboutClimateBE.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,7 +28,7 @@ builder.Services.AddCors(options =>
         });
 
 });
-
+builder.Services.AddScoped<IFormServices, FormServices>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
