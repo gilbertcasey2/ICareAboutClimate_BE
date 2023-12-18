@@ -17,7 +17,7 @@ namespace Epistimology_BE.DataAccess
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
             var connectionString = Configuration.GetConnectionString("WebApiDatabase");
-            //options.UseSqlServer(connectionString);
+            options.UseSqlServer(connectionString);
         }
     }
 }
