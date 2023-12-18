@@ -51,12 +51,15 @@ public class HomeController : Controller
     [Consumes("application/json")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public ActionResult ArrivedAtPage([FromBody] ArrivedResponseVM sent_response)
+    public ActionResult ArrivedAtPage([FromBody] ArrivedResponseVM arrival_info)
     {
-        Guid new_storeageID = sent_response.storeageID;
+        if (arrival_info == null) {
+            return ValidationProblem("No arrival information sent.");
+        }
+        Guid new_storeageID = arrival_info.storeageID;
         FormResponse new_responses = new() {
             storeageID = new_storeageID,
-            formIndex = sent_response.formIndex
+            formIndex = arrival_info.formIndex
         };
         return Ok(new_responses);
 
