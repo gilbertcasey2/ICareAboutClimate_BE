@@ -1,8 +1,0 @@
-{
-    "appService.preDeployTask": "publish-release",
-    "appService.deploySubpath": "bin/Release/net7.0/publish",
-    "appService.defaultWebAppToDeploy": "/subscriptions/3e402e81-9c96-43d7-aa70-ac93622f883e/resourceGroups/appsvc_windows_centralus/providers/Microsoft.Web/sites/ICareAboutClimate-CaseyElizabethGilbert",
-    "dataworkspace.excludedProjects": [
-        "ClimateDB/ClimateDB.sqlproj"
-    ]
-}
