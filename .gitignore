@@ -407,3 +407,5 @@ ASALocalRun/
 */lib/*
 
 .vscode/
+
+appsettings.Development.json

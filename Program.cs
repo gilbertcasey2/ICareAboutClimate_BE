@@ -1,11 +1,27 @@
-﻿using Epistimology_BE.DataAccess;
+﻿using ICareAboutClimate.DataAccess;
 using ICareAboutClimateBE.Services;
+using Microsoft.Extensions.Logging.ApplicationInsights;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<ClimateContext>();
+var connection = String.Empty;
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+    connection = builder.Configuration.GetConnectionString("WebApiDatabase");
+}
+else
+{
+    connection = Environment.GetEnvironmentVariable("WebApiDatabase");
+}
+
+builder.Services.AddDbContext<ClimateContext>(options =>
+    options.UseSqlServer(connection));
+
+// builder.Services.AddDbContext<ClimateContext>();
 
 builder.Services.AddCors(options =>
 {
@@ -17,27 +33,22 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .WithOrigins("https://localhost:44440");
         });
-    options.AddPolicy("CORSPolicy",
-        builder =>
-        {
-            builder
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .WithOrigins("https://climatechangeopinions.com");
-        });
-    options.AddPolicy("CORSPolicy",
-        builder =>
-        {
-            builder
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .WithOrigins("https://blue-wave-097a15c10.4.azurestaticapps.net/");
-        });
 });
 
 builder.Services.AddScoped<IFormServices, FormServices>();
 
+builder.Logging.AddApplicationInsights(
+        configureTelemetryConfiguration: (config) => 
+            config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+            configureApplicationInsightsLoggerOptions: (options) => { }
+    );
+
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("climate-opinions", LogLevel.Trace);
+
+
 var app = builder.Build();
+
+app.Logger.LogInformation("Initiating logging!");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
