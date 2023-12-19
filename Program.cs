@@ -1,5 +1,6 @@
 ﻿using Epistimology_BE.DataAccess;
 using ICareAboutClimateBE.Services;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -37,7 +38,18 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddScoped<IFormServices, FormServices>();
 
+builder.Logging.AddApplicationInsights(
+        configureTelemetryConfiguration: (config) => 
+            config.ConnectionString = builder.Configuration.GetConnectionString("APPLICATIONINSIGHTS_CONNECTION_STRING"),
+            configureApplicationInsightsLoggerOptions: (options) => { }
+    );
+
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("climate-opinions", LogLevel.Trace);
+
+
 var app = builder.Build();
+
+app.Logger.LogInformation("Initiating logging!");
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
