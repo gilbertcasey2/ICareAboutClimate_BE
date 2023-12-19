@@ -15,7 +15,7 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    connection = Environment.GetEnvironmentVariable("WebApiDatabase");
+    connection = Environment.GetEnvironmentVariable("SQLCONNSTR_WebApiDatabase");
 }
 
 builder.Services.AddDbContext<ClimateContext>(options =>
@@ -43,12 +43,11 @@ builder.Logging.AddApplicationInsights(
             configureApplicationInsightsLoggerOptions: (options) => { }
     );
 
-builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("climate-opinions", LogLevel.Trace);
-
+builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
-app.Logger.LogInformation("Initiating logging!");
+app.Logger.LogInformation("Initiating logging! {}", connection);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
