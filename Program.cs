@@ -17,6 +17,22 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader()
             .WithOrigins("https://localhost:44440");
         });
+    options.AddPolicy("CORSPolicy",
+        builder =>
+        {
+            builder
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithOrigins("https://climatechangeopinions.com");
+        });
+    options.AddPolicy("CORSPolicy",
+        builder =>
+        {
+            builder
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .WithOrigins("https://blue-wave-097a15c10.4.azurestaticapps.net/");
+        });
 });
 
 builder.Services.AddScoped<IFormServices, FormServices>();
