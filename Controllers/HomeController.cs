@@ -75,6 +75,8 @@ public class HomeController : Controller
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult ArrivedAtPage([FromBody] ArrivedResponseVM arrival_info)
     {
+        _logger.LogInformation("User arrived at contribute form. Session ID: {} ", arrival_info.storeageID);
+
         if (arrival_info == null) {
             return ValidationProblem("No arrival information sent.");
         }
@@ -99,6 +101,9 @@ public class HomeController : Controller
     public ActionResult SubmitQuestion([FromBody] SubmitQuestionVM sent_question)
     {
 
+        _logger.LogInformation("User submitted a question to the contribute form.");
+        _logger.LogWarning("An example of a Warning trace..");
+        _logger.LogError("An example of an Error level message");
         if (sent_question == null) {
             return ValidationProblem("No question sent.");
         }
