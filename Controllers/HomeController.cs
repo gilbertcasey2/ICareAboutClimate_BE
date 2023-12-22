@@ -102,8 +102,6 @@ public class HomeController : Controller
     {
 
         _logger.LogInformation("User submitted a question to the contribute form.");
-        _logger.LogWarning("An example of a Warning trace..");
-        _logger.LogError("An example of an Error level message");
         if (sent_question == null) {
             return ValidationProblem("No question sent.");
         }

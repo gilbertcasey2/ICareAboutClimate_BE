@@ -35,10 +35,19 @@ namespace ICareAboutClimateBE.Services
         }
 
         public void SubmitQuestion(SubmitQuestionVM sent_question) {
+
+            if (sent_question == null) {
+                throw new ApplicationException("Didn't receive responses.");
+            }
+
             DateTime currentTime = DateTime.Now;
-            FormQuestionResponse new_response = new(sent_question.questionIndex, sent_question.answerIndex, currentTime)
+            FormQuestionResponse new_response = new(sent_question.questionIndex)
             {
-                isFinalResponse = false
+                isFinalResponse = false,
+                timeStamp = currentTime,
+                otherAnswer = sent_question.otherAnswer,
+                isMultipleChoice = sent_question.multipleOptions,
+                answerIndex = sent_question.answerIndex
             };
 
             var existingForm = getOrMakeFormResponse(sent_question.userID, sent_question.formIndex);
@@ -53,21 +62,48 @@ namespace ICareAboutClimateBE.Services
 
             FormResponse? q_response = JsonConvert.DeserializeObject<FormResponse>(sent_questions);
 
-            
-
             if (q_response == null) {
                 throw new ApplicationException("Unable to get responses.");
             }
 
             FormResponse existingResponse = getOrMakeFormResponse(response.storeageID, response.formIndex);
-            existingResponse.responses = q_response.responses;
-            existingResponse.isCompleted = true;
 
-            for (int i = 0; i < existingResponse.responses?.Count; i++)
-            {
-                existingResponse.responses[i].isFinalResponse = true;
+            DateTime currentTime = DateTime.Now;
+
+            foreach(FormQuestionResponse resp in q_response.responses) {
+                bool found = existingResponse.responses.Any(p => p.questionIndex == resp.questionIndex);
+                if (found) {
+                    continue;
+                }
+                if (resp.isMultipleChoice) {
+                    FormQuestionResponse compiledResponse = new FormQuestionResponse(resp.questionIndex) {
+                        isMultipleChoice = true
+                    };
+                    String answerIndexString = "";
+                    foreach(FormQuestionResponse q_resp in q_response.responses.Where(p => p.questionIndex == resp.questionIndex)){
+                        String? newAnswerString = q_resp.answerIndex.ToString() + ",";
+                        if (newAnswerString == null) continue;
+                        else if (!answerIndexString.Contains(newAnswerString)) {
+                            answerIndexString = answerIndexString + newAnswerString;
+                        } else {
+                            answerIndexString = answerIndexString.Replace(newAnswerString, "");
+                        }
+                        if (q_resp.otherAnswer != null) {
+                            compiledResponse.otherAnswer = q_resp.otherAnswer;
+                        }
+                    }
+                    compiledResponse.answerIndexes = answerIndexString;
+                    compiledResponse.isFinalResponse = true;
+                    compiledResponse.timeStamp = currentTime;
+                    existingResponse.responses.Add(compiledResponse);
+                } else {
+                    resp.isFinalResponse = true;
+                    resp.timeStamp = currentTime;
+                    existingResponse.responses.Add(resp);
+                }
             }
 
+            existingResponse.isCompleted = true;
             _context.SaveChanges();
         }
 
