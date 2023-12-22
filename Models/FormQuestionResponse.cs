@@ -7,17 +7,26 @@ namespace ICareAboutClimateBE.Models
     {
         public int id {get; set;}
 		public int questionIndex { get; set; }
-		public int answerIndex { get; set; }
+
+        public int? answerIndex {get; set;}
+		public string? answerIndexes { get; set; }
+
+        public string? otherAnswer {get; set;}
 
         public bool? isFinalResponse {get; set;}
 
+        public bool isMultipleChoice {get; set;}
+
         public DateTime timeStamp {get; set;}
 
-        public FormQuestionResponse(int questionIndex, int answerIndex, DateTime timeStamp)
+        public FormQuestionResponse(int questionIndex)
         {
             this.questionIndex = questionIndex;
             this.answerIndex = answerIndex;
+            this.answerIndexes = answerIndexes;
             this.timeStamp = timeStamp;
+            this.otherAnswer = otherAnswer;
+            this.isMultipleChoice = isMultipleChoice;
         }
     }
 }
