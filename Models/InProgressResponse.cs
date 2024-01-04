@@ -1,13 +1,15 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+using System;
 using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace ICareAboutClimateBE.Models
 {
-	public class FormQuestionResponse
+    [Owned]
+	public class InProgressResponse
     {
         [Key]
-        public int id {get; set;}
+        public int progressId {get; set;}
 		public int questionIndex { get; set; }
 
         public int? answerIndex {get; set;}
@@ -23,11 +25,11 @@ namespace ICareAboutClimateBE.Models
 
         public virtual FormResponse formResponse {get; set;}
 
-        public FormQuestionResponse(int questionIndex)
+        public InProgressResponse(int questionIndex)
         {
             this.questionIndex = questionIndex;
             formResponse = new FormResponse();
-            isFinalResponse = true;
+            isFinalResponse = false;
         }
     }
 }

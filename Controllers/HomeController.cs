@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ICareAboutClimate.Models;
 using ICareAboutClimateBE.ViewModels;
 using ICareAboutClimateBE.Services;
+using ICareAboutClimateBE.Models;
 
 namespace ICareAboutClimate.Controllers;
 
@@ -31,6 +32,17 @@ public class HomeController : Controller
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+    }
+
+    [HttpGet]
+    [Route("getclimateresults")]
+    [Consumes("application/json")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public IEnumerable<FormResponse> GetResults()
+    {
+        var responseList = _formService.GetAllResponses();
+        return responseList;    
     }
 
     [HttpGet]

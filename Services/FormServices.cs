@@ -11,6 +11,7 @@ namespace ICareAboutClimateBE.Services
         void ResponseArrival(ArrivedResponseVM response);
         void SubmitQuestion(SubmitQuestionVM question);
         void SubmitForm(IndividualResponseVM response);
+        IEnumerable<FormResponse> GetAllResponses();
     }
 
     public class FormServices : IFormServices
@@ -22,13 +23,19 @@ namespace ICareAboutClimateBE.Services
             _context = context;
 		}
 
+        public IEnumerable<FormResponse> GetAllResponses() {
+            return _context.formResponses;
+        }
+
         public void ResponseArrival(ArrivedResponseVM arrival_info)
         {
             Guid new_storeageID = arrival_info.storeageID;
+            DateTime currentTime = DateTime.Now;
             FormResponse new_response = new()
             {
                 storeageID = new_storeageID,
-                formIndex = arrival_info.formIndex
+                formIndex = arrival_info.formIndex,
+                arrivalTimeStamp = currentTime
             };
             _context.formResponses.Add(new_response);
             _context.SaveChanges();
@@ -41,9 +48,8 @@ namespace ICareAboutClimateBE.Services
             }
 
             DateTime currentTime = DateTime.Now;
-            FormQuestionResponse new_response = new(sent_question.questionIndex)
+            InProgressResponse new_response = new(sent_question.questionIndex)
             {
-                isFinalResponse = false,
                 timeStamp = currentTime,
                 otherAnswer = sent_question.otherAnswer,
                 isMultipleChoice = sent_question.multipleOptions,
@@ -93,7 +99,6 @@ namespace ICareAboutClimateBE.Services
                         }
                     }
                     compiledResponse.answerIndexes = answerIndexString;
-                    compiledResponse.isFinalResponse = true;
                     compiledResponse.timeStamp = currentTime;
                     existingResponse.responses.Add(compiledResponse);
                 } else {
