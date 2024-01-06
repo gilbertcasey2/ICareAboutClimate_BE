@@ -2,6 +2,7 @@ using System;
 using ICareAboutClimate.DataAccess;
 using ICareAboutClimateBE.Models;
 using ICareAboutClimateBE.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace ICareAboutClimateBE.Services
@@ -24,7 +25,7 @@ namespace ICareAboutClimateBE.Services
 		}
 
         public IEnumerable<FormResponse> GetAllResponses() {
-            return _context.formResponses;
+            return _context.formResponses.Include(r => r.responses).Include(p => p.inProgressResponses).ToList();
         }
 
         public void ResponseArrival(ArrivedResponseVM arrival_info)
