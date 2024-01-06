@@ -408,4 +408,4 @@ ASALocalRun/
 
 .vscode/
 
-appsettings.Development.json
+appsettings.development.json

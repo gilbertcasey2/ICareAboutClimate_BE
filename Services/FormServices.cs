@@ -2,6 +2,7 @@ using System;
 using ICareAboutClimate.DataAccess;
 using ICareAboutClimateBE.Models;
 using ICareAboutClimateBE.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace ICareAboutClimateBE.Services
@@ -11,6 +12,7 @@ namespace ICareAboutClimateBE.Services
         void ResponseArrival(ArrivedResponseVM response);
         void SubmitQuestion(SubmitQuestionVM question);
         void SubmitForm(IndividualResponseVM response);
+        IEnumerable<FormResponse> GetAllResponses();
     }
 
     public class FormServices : IFormServices
@@ -22,23 +24,37 @@ namespace ICareAboutClimateBE.Services
             _context = context;
 		}
 
+        public IEnumerable<FormResponse> GetAllResponses() {
+            return _context.formResponses.Include(r => r.responses).Include(p => p.inProgressResponses).ToList();
+        }
+
         public void ResponseArrival(ArrivedResponseVM arrival_info)
         {
             Guid new_storeageID = arrival_info.storeageID;
+            DateTime currentTime = DateTime.Now;
             FormResponse new_response = new()
             {
                 storeageID = new_storeageID,
-                formIndex = arrival_info.formIndex
+                formIndex = arrival_info.formIndex,
+                arrivalTimeStamp = currentTime
             };
             _context.formResponses.Add(new_response);
             _context.SaveChanges();
         }
 
         public void SubmitQuestion(SubmitQuestionVM sent_question) {
+
+            if (sent_question == null) {
+                throw new ApplicationException("Didn't receive responses.");
+            }
+
             DateTime currentTime = DateTime.Now;
-            FormQuestionResponse new_response = new(sent_question.questionIndex, sent_question.answerIndex, currentTime)
+            InProgressResponse new_response = new(sent_question.questionIndex)
             {
-                isFinalResponse = false
+                timeStamp = currentTime,
+                otherAnswer = sent_question.otherAnswer,
+                isMultipleChoice = sent_question.multipleOptions,
+                answerIndex = sent_question.answerIndex
             };
 
             var existingForm = getOrMakeFormResponse(sent_question.userID, sent_question.formIndex);
@@ -53,21 +69,47 @@ namespace ICareAboutClimateBE.Services
 
             FormResponse? q_response = JsonConvert.DeserializeObject<FormResponse>(sent_questions);
 
-            
-
             if (q_response == null) {
                 throw new ApplicationException("Unable to get responses.");
             }
 
             FormResponse existingResponse = getOrMakeFormResponse(response.storeageID, response.formIndex);
-            existingResponse.responses = q_response.responses;
-            existingResponse.isCompleted = true;
 
-            for (int i = 0; i < existingResponse.responses?.Count; i++)
-            {
-                existingResponse.responses[i].isFinalResponse = true;
+            DateTime currentTime = DateTime.Now;
+
+            foreach(FormQuestionResponse resp in q_response.responses) {
+                bool found = existingResponse.responses.Any(p => p.questionIndex == resp.questionIndex);
+                if (found) {
+                    continue;
+                }
+                if (resp.isMultipleChoice) {
+                    FormQuestionResponse compiledResponse = new FormQuestionResponse(resp.questionIndex) {
+                        isMultipleChoice = true
+                    };
+                    String answerIndexString = "";
+                    foreach(FormQuestionResponse q_resp in q_response.responses.Where(p => p.questionIndex == resp.questionIndex)){
+                        String? newAnswerString = q_resp.answerIndex.ToString() + ",";
+                        if (newAnswerString == null) continue;
+                        else if (!answerIndexString.Contains(newAnswerString)) {
+                            answerIndexString = answerIndexString + newAnswerString;
+                        } else {
+                            answerIndexString = answerIndexString.Replace(newAnswerString, "");
+                        }
+                        if (q_resp.otherAnswer != null) {
+                            compiledResponse.otherAnswer = q_resp.otherAnswer;
+                        }
+                    }
+                    compiledResponse.answerIndexes = answerIndexString;
+                    compiledResponse.timeStamp = currentTime;
+                    existingResponse.responses.Add(compiledResponse);
+                } else {
+                    resp.isFinalResponse = true;
+                    resp.timeStamp = currentTime;
+                    existingResponse.responses.Add(resp);
+                }
             }
 
+            existingResponse.isCompleted = true;
             _context.SaveChanges();
         }
 

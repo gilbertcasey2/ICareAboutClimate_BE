@@ -5,7 +5,11 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+// builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
 
 var connection = String.Empty;
 if (builder.Environment.IsDevelopment())
@@ -15,7 +19,7 @@ if (builder.Environment.IsDevelopment())
 }
 else
 {
-    connection = Environment.GetEnvironmentVariable("WebApiDatabase");
+    connection = Environment.GetEnvironmentVariable("SQLCONNSTR_WebApiDatabase");
 }
 
 builder.Services.AddDbContext<ClimateContext>(options =>
@@ -31,7 +35,7 @@ builder.Services.AddCors(options =>
             builder
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://localhost:44440");
+            .WithOrigins("https://localhost:44440", "http://localhost:3000");
         });
 });
 
@@ -43,12 +47,11 @@ builder.Logging.AddApplicationInsights(
             configureApplicationInsightsLoggerOptions: (options) => { }
     );
 
-builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>("climate-opinions", LogLevel.Trace);
-
+builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
-app.Logger.LogInformation("Initiating logging!");
+app.Logger.LogInformation("Initiating logging! {}", connection);
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
